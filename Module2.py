@@ -24,7 +24,8 @@ prio=IntVar()
 def add():
     top=Toplevel()
     top.title('Add New Notes')
-
+    fr=Frame(top)
+    fr.grid(row=3,column=0)
     e1 = Entry(top,width=45,textvariable=p)
     e1.grid(row=0,column=0)
     b1=Label(top,text='Add Name',width=15,bg='cyan',fg='black')
@@ -36,8 +37,17 @@ def add():
     e2.grid(row=1,column=0)
     lb=Label(top,text='Add Content',width=20)
     lb.grid(row=2,column=0)
-    e3 = Text(top, width=45)
-    e3.grid(row=3, column=0)
+
+    scrollb = Scrollbar(fr, width=16)
+    scrollb.pack(side=RIGHT,fill=Y)
+    scrollbar.config(command=myLis.yview)
+
+
+    e3 = Text(fr, width=45,yscrollcommand=scrollb.set)
+    e3.pack(side=LEFT,fill=BOTH)
+
+
+
     c=Button(top, text='QUIT', width=15, height=2, bg='red', fg='white',command=top.destroy)
     c.grid(row=4, column=1)
     def save():
@@ -87,50 +97,104 @@ def search():
 
 def dele():
     del_id = myLis.get(myLis.curselection())
-    conn.execute("DELETE FROM Note where ID=?", (del_id[1],))
+    l = list(del_id.split(","))
+    del_id = l[0][1:]
+    conn.execute("DELETE FROM Note where ID=?", (del_id,))
     conn.commit()
-
+    liste()
 #    myLis.delete(0, END)
 
 def Up():
     del_id = myLis.get(myLis.curselection())
-    top=Toplevel()
+    top = Toplevel()
     top.title('Update Notes')
+    fr = Frame(top)
+    fr.grid(row=3, column=0)
 
-    e1 = Entry(top,width=45,textvariable=p)
-    e1.grid(row=0,column=0)
-    b1=Label(top,text='Name',width=15,bg='cyan',fg='black')
-    b1.grid(row=0,column=1)
-    b2 =Label(top, text='PRIORITY', width=15, bg='cyan', fg='black')
+    l = list(del_id.split(","))
+    del_id=l[0][1:]
+    print(l)
+
+
+
+
+
+    vr=StringVar()
+    vrr = StringVar()
+    l=conn.execute("SELECT NAME,PRIORITY,CONTENT FROM Note where ID=?", (del_id,))
+    for row in l:
+        x=row[0]
+        y=row[1]
+        z=row[2]
+
+    e1 = Entry(top, width=45, textvariable=vr)
+    vr.set(x)
+    e1.grid(row=0, column=0)
+    b1 = Label(top, text='Name', width=15, bg='cyan', fg='black')
+    b1.grid(row=0, column=1)
+    b2 = Label(top, text='PRIORITY', width=15, bg='cyan', fg='black')
     b2.grid(row=1, column=1)
 
-    e2 = Entry(top, width=45,textvariable=prio)
-    e2.grid(row=1,column=0)
-    lb=Label(top,text='Content',width=20)
-    lb.grid(row=2,column=0)
-    e3 = Text(top, width=45)
-    e3.grid(row=3, column=0)
-    c=Button(top, text='QUIT', width=15, height=2, bg='red', fg='white',command=top.destroy)
+    e2 = Entry(top, width=45,textvariable=vrr)
+    e2.grid(row=1, column=0)
+    vrr.set(y)
+    lb = Label(top, text='Content', width=20)
+    lb.grid(row=2, column=0)
+
+    scrollb = Scrollbar(fr, width=16)
+    scrollb.pack(side=RIGHT, fill=Y)
+    scrollbar.config(command=myLis.yview)
+
+    e3 = Text(fr, width=45, yscrollcommand=scrollb.set)
+    e3.pack(side=LEFT, fill=BOTH)
+
+    e3.insert(INSERT,z)
+    c = Button(top, text='QUIT', width=15, height=2, bg='red', fg='white', command=top.destroy)
     c.grid(row=4, column=1)
+
     def save():
-        x=str(p.get())
-        m=prio.get()
+        x = str(vr.get())
+        m = vrr.get()
 
-        input = str(e3.get("1.0",END))
-        conn.execute("INSERT INTO Note(NAME,CONTENT,PRIORITY)VALUES(?,?,?)",(x,input,m))
+        input = str(e3.get("1.0", END))
+        conn.execute("INSERT INTO Note(NAME,CONTENT,PRIORITY)VALUES(?,?,?)", (x, input, m))
         conn.commit()
-    bc = Button(top, text='SAVE', width=15, height=2, bg='green', fg='orange',command=save).grid(row=4, column=0)
 
+
+
+    br = Button(top, text='SAVE', width=15, height=2, bg='green', fg='orange', command=save).grid(row=4, column=0)
+
+    liste()
 
 
 def redd():
     del_id = myLis.get(myLis.curselection())
+    l = list(del_id.split(","))
+    del_id=l[0][1:]
+    print(l)
+    l=conn.execute("SELECT NAME,PRIORITY,CONTENT FROM Note where ID=?", (del_id,))
+    for row in l:
+        z=row[2]
+
     top = Toplevel()
+    fr = Frame(top)
+    fr.grid(row=1, column=0)
+
     top.title('Read Notes')
     lb = Label(top, text='Content', width=20)
     lb.grid(row=0, column=0)
-    e3 = Text(top, width=70)
-    e3.grid(row=1, column=0)
+
+    scrollb = Scrollbar(fr, width=16)
+    scrollb.pack(side=RIGHT, fill=Y)
+    scrollbar.config(command=myLis.yview)
+
+    e3 = Text(fr, width=45, yscrollcommand=scrollb.set)
+    e3.pack(side=LEFT, fill=BOTH)
+
+    e3.insert(INSERT,z)
+    c = Button(top, text='QUIT', width=15, height=2, bg='red', fg='white', command=top.destroy)
+    c.grid(row=4, column=0)
+
 
 def butt():
     b = Button(frame5, text='Update', bg='blue', fg='orange', command=Up).grid(row=4,column=2)
