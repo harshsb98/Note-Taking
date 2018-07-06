@@ -113,11 +113,6 @@ def Up():
 
     l = list(del_id.split(","))
     del_id=l[0][1:]
-    print(l)
-
-
-
-
 
     vr=StringVar()
     vrr = StringVar()
@@ -159,12 +154,15 @@ def Up():
         input = str(e3.get("1.0", END))
         conn.execute("INSERT INTO Note(NAME,CONTENT,PRIORITY)VALUES(?,?,?)", (x, input, m))
         conn.commit()
+        top.destroy()
 
+        liste()
 
 
     br = Button(top, text='SAVE', width=15, height=2, bg='green', fg='orange', command=save).grid(row=4, column=0)
+    conn.execute("DELETE FROM Note where ID=?", (del_id,))
+    conn.commit()
 
-    liste()
 
 
 def redd():
