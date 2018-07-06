@@ -57,6 +57,7 @@ def add():
         input = str(e3.get("1.0",END))
         conn.execute("INSERT INTO Note(NAME,CONTENT,PRIORITY)VALUES(?,?,?)",(x,input,m))
         conn.commit()
+        top.destroy()
     br = Button(top, text='SAVE', width=15, height=2, bg='green', fg='orange',command=save).grid(row=4, column=0)
 
 
@@ -90,9 +91,7 @@ def search():
     z=str(v.get())
     cursor = conn.execute("SELECT ID,NAME from Note where NAME=?",(z,))
     for row in cursor:
-        print(row)
         myLis.insert(END, str(row))
-    myLis.pack(side=LEFT, fill=BOTH)
     butt()
 
 def dele():
@@ -155,14 +154,14 @@ def Up():
         conn.execute("INSERT INTO Note(NAME,CONTENT,PRIORITY)VALUES(?,?,?)", (x, input, m))
         conn.commit()
         top.destroy()
+        conn.execute("DELETE FROM Note where ID=?", (del_id,))
+        conn.commit()
 
         liste()
 
 
     br = Button(top, text='SAVE', width=15, height=2, bg='green', fg='orange', command=save).grid(row=4, column=0)
-    conn.execute("DELETE FROM Note where ID=?", (del_id,))
-    conn.commit()
-
+    liste()
 
 
 def redd():
@@ -193,6 +192,13 @@ def redd():
     c = Button(top, text='QUIT', width=15, height=2, bg='red', fg='white', command=top.destroy)
     c.grid(row=4, column=0)
 
+def sot():
+    myLis.delete(0, END)
+    cursor=conn.execute("SELECT ID,NAME FROM Note ORDER BY PRIORITY ASC")
+    for row in cursor:
+        myLis.insert(END, str(row))
+
+
 
 def butt():
     b = Button(frame5, text='Update', bg='blue', fg='orange', command=Up).grid(row=4,column=2)
@@ -200,6 +206,8 @@ def butt():
     c = Button(frame5, text='Delete', bg='blue', fg='orange', command=dele).grid(row=5,column=2)
 
     d = Button(frame5, text='Read', bg='blue', fg='orange', command=redd).grid(row=6,column=2)
+
+    e=Button(frame5, text='Sort', bg='blue', fg='orange', command=sot).grid(row=3,column=2)
 
 button2=Button(frame1,text='List All Notes',bg='red',width=25,height=2,fg='white',command=liste).grid(row=0,column=1,padx=5,pady=10)
 button3=Button(frame2,text='Search',bg='red',width=10,height=1,fg='white',command=search).grid(row=2,column=1)
